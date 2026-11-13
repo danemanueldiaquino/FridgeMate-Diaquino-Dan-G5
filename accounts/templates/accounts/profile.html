@@ -1,47 +1,32 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>My Profile</title>
-</head>
-<body>
-
-    <h1>My FridgeMate Profile</h1>
-
-    {% if messages %}
-        {% for message in messages %}
-            <p>{{ message }}</p>
-        {% endfor %}
-    {% endif %}
-
-    {% if user_profile.profile_photo %}
-        <img
-            src="{{ user_profile.profile_photo.url }}"
-            width="120"
-            alt="Profile Photo"
-        >
-    {% endif %}
-
-    <p>Username: {{ user_profile.username }}</p>
-
-    <p>First Name: {{ user_profile.first_name }}</p>
-
-    <p>Last Name: {{ user_profile.last_name }}</p>
-
-    <p>Email: {{ user_profile.email }}</p>
-
-    <p>Contact: {{ user_profile.contact_number }}</p>
-
-    <p>Role: {{ user_profile.get_role_display }}</p>
-
-    <a href="{% url 'edit_profile' %}">
-        Edit Profile
-    </a>
-
-    <br>
-
-    <a href="{% url 'dashboard' %}">
-        Back to Dashboard
-    </a>
-
-</body>
-</html>
+{% extends 'accounts/base.html' %}
+{% block title %}My profile · FridgeMate{% endblock %}
+{% block breadcrumb %}My profile{% endblock %}
+{% block content %}
+    <section class="profile-page">
+        <div class="welcome-row profile-welcome">
+            <div><div class="eyebrow"><span class="eyebrow-spark">✳</span> YOUR LITTLE CORNER</div><h1>My profile<span class="wave" aria-hidden="true">✦</span></h1><p class="welcome-subtitle">The person behind the good groceries.</p></div>
+            <a class="secondary-button" href="{% url 'edit_profile' %}"><span aria-hidden="true">↗</span> Edit profile</a>
+        </div>
+        <div class="profile-grid">
+            <section class="profile-card profile-identity">
+                <div class="profile-avatar">{% if user_profile.profile_photo %}<img src="{{ user_profile.profile_photo.url }}" alt="{{ user_profile.get_full_name }}">{% elif user_profile.first_name %}{{ user_profile.first_name|first|upper }}{% else %}{{ user_profile.username|first|upper }}{% endif %}<span class="avatar-leaf">✳</span></div>
+                <h2>{{ user_profile.get_full_name|default:user_profile.username }}</h2>
+                <p>@{{ user_profile.username }}</p>
+                <span class="role-pill"><span>✳</span> {{ user_profile.get_role_display }}</span>
+                <div class="identity-note"><span aria-hidden="true">♧</span><span>Good things are better<br>when shared.</span></div>
+            </section>
+            <section class="profile-card profile-details">
+                <div class="section-heading compact-heading"><div><div class="eyebrow">YOUR DETAILS</div><h2>About you</h2></div><span class="heading-spark" aria-hidden="true">✳</span></div>
+                <dl class="detail-list">
+                    <div><dt>First name</dt><dd>{{ user_profile.first_name|default:"Not added yet" }}</dd></div>
+                    <div><dt>Last name</dt><dd>{{ user_profile.last_name|default:"Not added yet" }}</dd></div>
+                    <div><dt>Email address</dt><dd>{{ user_profile.email|default:"Not added yet" }}</dd></div>
+                    <div><dt>Contact number</dt><dd>{{ user_profile.contact_number|default:"Not added yet" }}</dd></div>
+                    <div><dt>Your role</dt><dd>{{ user_profile.get_role_display }}</dd></div>
+                </dl>
+                <a class="text-link profile-edit-link" href="{% url 'edit_profile' %}">Update your details <span aria-hidden="true">→</span></a>
+            </section>
+        </div>
+        <div class="profile-back"><a class="text-link" href="{% url 'dashboard' %}">← Back to dashboard</a></div>
+    </section>
+{% endblock %}

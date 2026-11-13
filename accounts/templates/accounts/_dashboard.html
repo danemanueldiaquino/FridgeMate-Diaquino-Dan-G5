@@ -1,0 +1,71 @@
+<section class="welcome-row">
+    <div>
+        <div class="eyebrow"><span class="eyebrow-spark">✳</span> YOUR KITCHEN, IN SYNC</div>
+        <h1>Good morning, {{ request.user.first_name|default:request.user.username }}<span class="wave" aria-hidden="true">✦</span></h1>
+        <p class="welcome-subtitle">A little fridge check-in goes a long way.</p>
+    </div>
+    <div class="date-card"><span class="date-icon" aria-hidden="true">▦</span><span><strong id="today-date">Today</strong><small>YOUR FRIDGE AT A GLANCE</small></span></div>
+</section>
+
+<section class="stats-grid" aria-label="Refrigerator overview">
+    <article class="stat-card stat-mint"><span class="stat-icon" aria-hidden="true">◫</span><span class="stat-label">Total food items</span><strong>12</strong><span class="stat-foot">across 4 shelves <span>↗</span></span></article>
+    <article class="stat-card stat-peach" id="expiring"><span class="stat-icon" aria-hidden="true">◷</span><span class="stat-label">Expiring soon</span><strong>03</strong><span class="stat-foot">within the next 3 days <span>!</span></span></article>
+    <article class="stat-card stat-lavender"><span class="stat-icon" aria-hidden="true">✳</span><span class="stat-label">Past its best</span><strong>01</strong><span class="stat-foot">ready for a quick check <span>↗</span></span></article>
+    <article class="stat-card stat-blue"><span class="stat-icon" aria-hidden="true">◧</span><span class="stat-label">Fridge space</span><strong>68<span class="stat-percent">%</span></strong><span class="stat-progress"><i></i></span><span class="stat-foot">room for more good things</span></article>
+</section>
+
+<div class="dashboard-grid">
+    <section class="fridge-section" id="fridge">
+        <div class="section-heading">
+            <div><div class="eyebrow">THE GOOD STUFF</div><h2>Your refrigerator <span class="preview-tag">DEMO PREVIEW</span></h2></div>
+            <a class="text-link" href="#inventory">See all items <span aria-hidden="true">→</span></a>
+        </div>
+        <div class="fridge-frame">
+            <div class="fridge-topline"><span><i class="cooling-dot"></i> COOL &amp; ORGANIZED</span><span>✧ &nbsp; FRESHNESS CHECK</span></div>
+            <div class="fridge-interior">
+                <div class="fridge-shelf-label"><span>TOP SHELF</span><span>READY TO ENJOY</span></div>
+                <div class="food-row">
+                    <article class="food-card food-yogurt"><div class="food-visual"><span aria-hidden="true">🥛</span><i class="food-sparkle">✳</i></div><div class="food-info"><strong>Oat milk</strong><span>1 carton · Maya</span><small class="fresh-label">FRESH FOR 6 DAYS</small></div></article>
+                    <article class="food-card food-berries"><div class="food-visual"><span aria-hidden="true">🫐</span><i class="food-sparkle">✳</i></div><div class="food-info"><strong>Blueberries</strong><span>1 punnet · Alex</span><small class="soon-label">BEST BY TOMORROW</small></div></article>
+                    <article class="food-card food-jar"><div class="food-visual"><span aria-hidden="true">🫙</span><i class="food-sparkle">✳</i></div><div class="food-info"><strong>Greek yogurt</strong><span>2 cups · You</span><small class="fresh-label">FRESH FOR 4 DAYS</small></div></article>
+                </div>
+                <div class="shelf-rail"><span></span></div>
+                <div class="fridge-shelf-label"><span>THE CRISPER</span><span>COLOR YOUR PLATE</span></div>
+                <div class="food-row food-row-bottom">
+                    <article class="food-card food-avocado"><div class="food-visual"><span aria-hidden="true">🥑</span><i class="food-sparkle">✳</i></div><div class="food-info"><strong>Avocados</strong><span>3 pieces · Maya</span><small class="fresh-label">FRESH FOR 5 DAYS</small></div></article>
+                    <article class="food-card food-carrot"><div class="food-visual"><span aria-hidden="true">🥕</span><i class="food-sparkle">✳</i></div><div class="food-info"><strong>Baby carrots</strong><span>1 bag · You</span><small class="expired-label">CHECK TODAY</small></div></article>
+                    <article class="food-card food-lemon"><div class="food-visual"><span aria-hidden="true">🍋</span><i class="food-sparkle">✳</i></div><div class="food-info"><strong>Fresh lemons</strong><span>4 pieces · Alex</span><small class="fresh-label">FRESH FOR 9 DAYS</small></div></article>
+                </div>
+                <div class="shelf-rail shelf-rail-last"><span></span></div>
+                <div class="fridge-bottom-note"><span class="leaf-icon" aria-hidden="true">❋</span><span>Everything has its place. <strong>Nice work, team.</strong></span><span class="fridge-temp">3°C</span></div>
+            </div>
+        </div>
+        <p class="preview-note">Illustrative preview items — your inventory isn’t connected yet.</p>
+    </section>
+
+    <aside class="right-rail">
+        <section class="quick-actions panel-card" id="inventory">
+            <div class="section-heading compact-heading"><div><div class="eyebrow">MAKE IT HAPPEN</div><h2>Quick actions</h2></div><span class="heading-spark" aria-hidden="true">✳</span></div>
+            <button type="button" class="action-row" data-preview-action><span class="action-icon action-add" aria-hidden="true">＋</span><span><strong>Add food item</strong><small>Keep the fridge up to date</small></span><span class="action-arrow">↗</span></button>
+            <a class="action-row" href="#fridge"><span class="action-icon action-inventory" aria-hidden="true">▤</span><span><strong>View inventory</strong><small>Browse what’s on the shelves</small></span><span class="action-arrow">↗</span></a>
+            {% if request.user.role == 'manager' %}
+                <button type="button" class="action-row" data-preview-action id="members"><span class="action-icon action-members" aria-hidden="true">♧</span><span><strong>Manage members</strong><small>Make room at the table</small></span><span class="action-arrow">↗</span></button>
+            {% else %}
+                <a class="action-row" href="{% url 'profile' %}"><span class="action-icon action-members" aria-hidden="true">◎</span><span><strong>Your profile</strong><small>Keep your details fresh</small></span><span class="action-arrow">↗</span></a>
+            {% endif %}
+            <a class="action-row" href="#expiring"><span class="action-icon action-expiry" aria-hidden="true">◷</span><span><strong>Check what’s expiring</strong><small>Use it, share it, love it</small></span><span class="action-arrow">↗</span></a>
+            <p class="action-feedback" aria-live="polite"></p>
+        </section>
+
+        <section class="activity-card panel-card" id="activity">
+            <div class="section-heading compact-heading"><div><div class="eyebrow">LITTLE FRIDGE MOMENTS</div><h2>Recent activity</h2></div><span class="activity-live"><i></i> DEMO</span></div>
+            <div class="activity-list">
+                <div class="activity-item"><span class="activity-emoji activity-green" aria-hidden="true">🥬</span><span class="activity-copy"><strong>Maya added baby spinach</strong><small>to the crisper drawer</small><small class="activity-time">12 minutes ago</small></span><span class="activity-dot"></span></div>
+                <div class="activity-item"><span class="activity-emoji activity-peach" aria-hidden="true">🥛</span><span class="activity-copy"><strong>You added oat milk</strong><small>1 carton · top shelf</small><small class="activity-time">Yesterday, 6:42 PM</small></span><span class="activity-dot"></span></div>
+                <div class="activity-item"><span class="activity-emoji activity-blue" aria-hidden="true">🍓</span><span class="activity-copy"><strong>Alex finished the strawberries</strong><small>Thanks for the heads-up!</small><small class="activity-time">Yesterday, 2:10 PM</small></span><span class="activity-dot"></span></div>
+            </div>
+            <p class="preview-note activity-note">Sample activity for interface preview.</p>
+        </section>
+    </aside>
+</div>
+<div class="demo-toast" role="status" aria-live="polite"></div>

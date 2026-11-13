@@ -1,24 +1,5 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Manager Dashboard</title>
-</head>
-<body>
-
-    <h1>FridgeMate Manager Dashboard</h1>
-
-    <h2>Welcome, {{ request.user.first_name }}!</h2>
-
-    <p>You are logged in as a Fridge Manager.</p>
-
-    <nav>
-        <a href="{% url 'profile' %}">My Profile</a>
-
-        <form method="POST" action="{% url 'logout' %}">
-            {% csrf_token %}
-            <button type="submit">Logout</button>
-        </form>
-    </nav>
-
-</body>
-</html>
+{% extends 'accounts/base.html' %}
+{% block title %}Manager dashboard · FridgeMate{% endblock %}
+{% block content %}
+    {% include 'accounts/_dashboard.html' %}
+{% endblock %}
