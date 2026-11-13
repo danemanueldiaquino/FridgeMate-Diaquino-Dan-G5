@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Member Dashboard</title>
+</head>
+<body>
+
+    <h1>FridgeMate Member Dashboard</h1>
+
+    <h2>Welcome, {{ request.user.first_name }}!</h2>
+
+    <p>You are logged in as a FridgeMate Member.</p>
+
+    <nav>
+        <a href="{% url 'profile' %}">My Profile</a>
+
+        <form method="POST" action="{% url 'logout' %}">
+            {% csrf_token %}
+            <button type="submit">Logout</button>
+        </form>
+    </nav>
+
+</body>
+</html>
