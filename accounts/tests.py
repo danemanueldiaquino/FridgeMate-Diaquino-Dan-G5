@@ -18,3 +18,19 @@ class FridgeItemModelFormTests(TestCase):
         form = FridgeItemForm(data={'name': 'Eggs', 'category': 'Dairy', 'zone': FridgeItem.ZONE_FRIDGE, 'quantity': '0', 'unit': 'pcs', 'expiry_date': ''})
         self.assertFalse(form.is_valid())
         self.assertIn('quantity', form.errors)
+
+
+class FridgeItemCrudViewTests(TestCase):
+    def setUp(self):
+        User = get_user_model()
+        self.user = User.objects.create_user(username='member2', email='member2@example.com', password='TestPass123!')
+
+    def test_fridge_item_list_requires_login(self):
+        response = self.client.get('/fridge-items/')
+        self.assertEqual(response.status_code, 302)
+
+    def test_authenticated_user_can_create_and_list_item(self):
+        self.client.login(username='member2', password='TestPass123!')
+        response = self.client.post('/fridge-items/add/', {'name': 'Butter', 'category': 'Dairy', 'zone': FridgeItem.ZONE_FRIDGE, 'quantity': '2.00', 'unit': 'packs', 'expiry_date': ''})
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(FridgeItem.objects.filter(owner=self.user, name='Butter').exists())
