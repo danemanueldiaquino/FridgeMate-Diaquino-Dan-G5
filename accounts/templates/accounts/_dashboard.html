@@ -69,3 +69,58 @@
     </aside>
 </div>
 <div class="demo-toast" role="status" aria-live="polite"></div>
+
+<section id="inventory" style="margin-top: 1.5rem; background: #fff; padding: 1.25rem; border-radius: 14px; border: 1px solid #e3e6de;">
+    <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 0.75rem; margin-bottom: 1rem;">
+        <div>
+            <h2 style="margin: 0;">Fridge Item Tracking ({{ total_items|default:0 }})</h2>
+            <p style="margin: 0.25rem 0 0; opacity: 0.8;">
+                {% if request.user.role == 'manager' %}
+                    Recent items across the shared fridge.
+                {% else %}
+                    Your recently tracked fridge items.
+                {% endif %}
+            </p>
+        </div>
+        <div style="display: flex; gap: 0.6rem;">
+            <a href="{% url 'fridge_item_list' %}" style="padding: 0.55rem 0.9rem; border-radius: 8px; border: 1px solid #1D4439; text-decoration: none;">View all</a>
+            <a href="{% url 'fridge_item_create' %}" style="padding: 0.55rem 0.9rem; border-radius: 8px; background: #1D4439; color: #fff; text-decoration: none; font-weight: 600;">+ Add item</a>
+        </div>
+    </div>
+
+    {% if recent_items %}
+        <div style="overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                <thead>
+                    <tr style="border-bottom: 1px solid #e3e6de;">
+                        <th style="padding: 0.65rem 0.75rem;">Item</th>
+                        <th style="padding: 0.65rem 0.75rem;">Zone</th>
+                        <th style="padding: 0.65rem 0.75rem;">Quantity</th>
+                        <th style="padding: 0.65rem 0.75rem;">Expiry</th>
+                        {% if request.user.role == 'manager' %}<th style="padding: 0.65rem 0.75rem;">Owner</th>{% endif %}
+                        <th style="padding: 0.65rem 0.75rem;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in recent_items %}
+                        <tr style="border-bottom: 1px solid #f0f2ec;">
+                            <td style="padding: 0.65rem 0.75rem;"><strong>{{ item.name }}</strong></td>
+                            <td style="padding: 0.65rem 0.75rem;">{{ item.get_zone_display }}</td>
+                            <td style="padding: 0.65rem 0.75rem;">{{ item.quantity }} {{ item.unit }}</td>
+                            <td style="padding: 0.65rem 0.75rem;">{{ item.expiry_date|default:"No expiry" }}</td>
+                            {% if request.user.role == 'manager' %}
+                                <td style="padding: 0.65rem 0.75rem;">{{ item.owner.get_full_name|default:item.owner.username }}</td>
+                            {% endif %}
+                            <td style="padding: 0.65rem 0.75rem;">
+                                <a href="{% url 'fridge_item_update' item.pk %}">Edit</a> ·
+                                <a href="{% url 'fridge_item_delete' item.pk %}" style="color: #b42318;">Delete</a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <p style="margin: 0;">No items tracked yet. <a href="{% url 'fridge_item_create' %}">Add your first item</a>.</p>
+    {% endif %}
+</section>

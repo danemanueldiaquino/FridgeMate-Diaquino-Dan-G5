@@ -1,12 +1,23 @@
-from django.shortcuts import render, redirect
 from django.contrib import messages
-from django.contrib.auth import login
+from django.contrib.auth import get_user_model, login
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth import get_user_model
+from django.shortcuts import get_object_or_404, redirect, render
 
-from .forms import RegistrationForm
+from .decorators import role_required
+from .forms import FridgeItemForm, ProfileForm, RegistrationForm
+from .models import FridgeItem
 
 User = get_user_model()
+
+
+def _can_manage_all(user):
+    return getattr(user, 'role', '') == 'manager' or user.is_superuser
+
+
+def _scoped_items_queryset(user):
+    if _can_manage_all(user):
+        return FridgeItem.objects.select_related('owner')
+    return FridgeItem.objects.filter(owner=user)
 
 
 def register(request):
@@ -38,8 +49,6 @@ def register(request):
         {'form': form}
     )
 
-from .decorators import role_required
-
 
 @login_required
 def dashboard(request):
@@ -52,21 +61,30 @@ def dashboard(request):
 
 @role_required('manager')
 def manager_dashboard(request):
-
+    items = FridgeItem.objects.select_related('owner')[:10]
+    total_items = FridgeItem.objects.count()
     return render(
         request,
-        'accounts/manager_dashboard.html'
+        'accounts/manager_dashboard.html',
+        {
+            'recent_items': items,
+            'total_items': total_items,
+        }
     )
 
 
 @role_required('member')
 def member_dashboard(request):
-
+    items = FridgeItem.objects.filter(owner=request.user)[:10]
+    total_items = FridgeItem.objects.filter(owner=request.user).count()
     return render(
         request,
-        'accounts/member_dashboard.html'
+        'accounts/member_dashboard.html',
+        {
+            'recent_items': items,
+            'total_items': total_items,
+        }
     )
-from .forms import ProfileForm
 
 
 @login_required
@@ -108,4 +126,91 @@ def edit_profile(request):
         request,
         'accounts/edit_profile.html',
         {'form': form}
+    )
+
+
+@login_required
+def fridge_item_list(request):
+    items = _scoped_items_queryset(request.user)
+    zone_filter = request.GET.get('zone', '').strip()
+
+    if zone_filter in dict(FridgeItem.StorageZone.choices):
+        items = items.filter(zone=zone_filter)
+
+    return render(
+        request,
+        'accounts/fridge_item_list.html',
+        {
+            'items': items,
+            'selected_zone': zone_filter,
+            'zones': FridgeItem.StorageZone.choices,
+            'can_manage_all': _can_manage_all(request.user),
+        }
+    )
+
+
+@login_required
+def fridge_item_create(request):
+    if request.method == 'POST':
+        form = FridgeItemForm(request.POST)
+        if form.is_valid():
+            item = form.save(commit=False)
+            item.owner = request.user
+            item.save()
+            messages.success(request, f'Added "{item.name}" to fridge tracking.')
+            return redirect('fridge_item_list')
+        messages.error(request, 'Please correct the errors below.')
+    else:
+        form = FridgeItemForm()
+
+    return render(
+        request,
+        'accounts/fridge_item_form.html',
+        {
+            'form': form,
+            'page_title': 'Add Fridge Item',
+            'submit_label': 'Save Item',
+        }
+    )
+
+
+@login_required
+def fridge_item_update(request, pk):
+    item = get_object_or_404(_scoped_items_queryset(request.user), pk=pk)
+
+    if request.method == 'POST':
+        form = FridgeItemForm(request.POST, instance=item)
+        if form.is_valid():
+            form.save()
+            messages.success(request, f'Updated "{item.name}".')
+            return redirect('fridge_item_list')
+        messages.error(request, 'Please correct the errors below.')
+    else:
+        form = FridgeItemForm(instance=item)
+
+    return render(
+        request,
+        'accounts/fridge_item_form.html',
+        {
+            'form': form,
+            'page_title': 'Edit Fridge Item',
+            'submit_label': 'Update Item',
+        }
+    )
+
+
+@login_required
+def fridge_item_delete(request, pk):
+    item = get_object_or_404(_scoped_items_queryset(request.user), pk=pk)
+
+    if request.method == 'POST':
+        item_name = item.name
+        item.delete()
+        messages.success(request, f'Removed "{item_name}" from fridge tracking.')
+        return redirect('fridge_item_list')
+
+    return render(
+        request,
+        'accounts/fridge_item_confirm_delete.html',
+        {'item': item}
     )

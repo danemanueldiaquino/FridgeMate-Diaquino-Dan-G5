@@ -1,16 +1,14 @@
-from django.urls import path
 from django.contrib.auth import views as auth_views
+from django.urls import path
 
 from . import views
 
 urlpatterns = [
-
     path(
         'register/',
         views.register,
         name='register'
     ),
-
     path(
         'login/',
         auth_views.LoginView.as_view(
@@ -19,40 +17,54 @@ urlpatterns = [
         ),
         name='login'
     ),
-
     path(
         'logout/',
         auth_views.LogoutView.as_view(),
         name='logout'
     ),
-
     path(
         'dashboard/',
         views.dashboard,
         name='dashboard'
     ),
-
     path(
         'manager-dashboard/',
         views.manager_dashboard,
         name='manager_dashboard'
     ),
-
     path(
         'member-dashboard/',
         views.member_dashboard,
         name='member_dashboard'
     ),
-
     path(
         'profile/',
         views.profile,
         name='profile'
     ),
-
     path(
         'profile/edit/',
         views.edit_profile,
         name='edit_profile'
+    ),
+    path(
+        'fridge-items/',
+        views.fridge_item_list,
+        name='fridge_item_list'
+    ),
+    path(
+        'fridge-items/add/',
+        views.fridge_item_create,
+        name='fridge_item_create'
+    ),
+    path(
+        'fridge-items/<int:pk>/edit/',
+        views.fridge_item_update,
+        name='fridge_item_update'
+    ),
+    path(
+        'fridge-items/<int:pk>/delete/',
+        views.fridge_item_delete,
+        name='fridge_item_delete'
     ),
 ]

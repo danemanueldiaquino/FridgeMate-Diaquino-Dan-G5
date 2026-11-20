@@ -1,0 +1,81 @@
+{% extends 'accounts/base.html' %}
+
+{% block title %}Food inventory · FridgeMate{% endblock %}
+{% block breadcrumb %}Food inventory{% endblock %}
+
+{% block content %}
+<section style="display: flex; flex-direction: column; gap: 1.25rem;">
+    <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 1rem;">
+        <div>
+            <h1 style="margin: 0;">Fridge Item Tracking</h1>
+            <p style="margin: 0.25rem 0 0; opacity: 0.8;">
+                {% if can_manage_all %}
+                    Viewing all shared household fridge items as Fridge Manager.
+                {% else %}
+                    Manage the items you added to the fridge.
+                {% endif %}
+            </p>
+        </div>
+        <a href="{% url 'fridge_item_create' %}" style="padding: 0.65rem 1rem; border-radius: 10px; background: #1D4439; color: #fff; text-decoration: none; font-weight: 600;">
+            + Add fridge item
+        </a>
+    </div>
+
+    <form method="get" style="display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem;">
+        <label for="zone"><strong>Storage zone:</strong></label>
+        <select name="zone" id="zone" style="padding: 0.5rem 0.75rem; border-radius: 8px; border: 1px solid #cbd2c9;">
+            <option value="">All zones</option>
+            {% for value, label in zones %}
+                <option value="{{ value }}" {% if selected_zone == value %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+        </select>
+        <button type="submit" style="padding: 0.5rem 0.9rem; border-radius: 8px; border: 1px solid #1D4439; background: #fff; cursor: pointer;">
+            Filter
+        </button>
+        {% if selected_zone %}
+            <a href="{% url 'fridge_item_list' %}" style="font-size: 0.9rem;">Reset</a>
+        {% endif %}
+    </form>
+
+    {% if items %}
+        <div style="overflow-x: auto; background: #fff; border-radius: 14px; border: 1px solid #e3e6de;">
+            <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                <thead>
+                    <tr style="border-bottom: 1px solid #e3e6de;">
+                        <th style="padding: 0.85rem 1rem;">Item</th>
+                        <th style="padding: 0.85rem 1rem;">Category</th>
+                        <th style="padding: 0.85rem 1rem;">Zone</th>
+                        <th style="padding: 0.85rem 1rem;">Quantity</th>
+                        <th style="padding: 0.85rem 1rem;">Expiry date</th>
+                        {% if can_manage_all %}<th style="padding: 0.85rem 1rem;">Added by</th>{% endif %}
+                        <th style="padding: 0.85rem 1rem;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in items %}
+                        <tr style="border-bottom: 1px solid #f0f2ec;">
+                            <td style="padding: 0.8rem 1rem;"><strong>{{ item.name }}</strong></td>
+                            <td style="padding: 0.8rem 1rem;">{{ item.category|default:"—" }}</td>
+                            <td style="padding: 0.8rem 1rem;">{{ item.get_zone_display }}</td>
+                            <td style="padding: 0.8rem 1rem;">{{ item.quantity }} {{ item.unit }}</td>
+                            <td style="padding: 0.8rem 1rem;">{{ item.expiry_date|default:"No expiry" }}</td>
+                            {% if can_manage_all %}
+                                <td style="padding: 0.8rem 1rem;">{{ item.owner.get_full_name|default:item.owner.username }}</td>
+                            {% endif %}
+                            <td style="padding: 0.8rem 1rem; white-space: nowrap;">
+                                <a href="{% url 'fridge_item_update' item.pk %}" style="margin-right: 0.75rem;">Edit</a>
+                                <a href="{% url 'fridge_item_delete' item.pk %}" style="color: #b42318;">Delete</a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div style="padding: 1.5rem; background: #fff; border-radius: 14px; border: 1px solid #e3e6de;">
+            <p style="margin: 0 0 0.75rem;">No fridge items found yet.</p>
+            <a href="{% url 'fridge_item_create' %}">Add your first fridge item →</a>
+        </div>
+    {% endif %}
+</section>
+{% endblock %}

@@ -28,7 +28,9 @@
                     <span class="nav-icon" aria-hidden="true">⌂</span><span>Dashboard</span>
                 </a>
                 <a class="nav-item" href="{% url 'dashboard' %}#fridge"><span class="nav-icon" aria-hidden="true">▤</span><span>My refrigerator</span></a>
-                <a class="nav-item" href="{% url 'dashboard' %}#inventory"><span class="nav-icon" aria-hidden="true">◫</span><span>Food inventory</span></a>
+                <a class="nav-item {% if request.resolver_match.url_name == 'fridge_item_list' or request.resolver_match.url_name == 'fridge_item_create' or request.resolver_match.url_name == 'fridge_item_update' or request.resolver_match.url_name == 'fridge_item_delete' %}is-active{% endif %}" href="{% url 'fridge_item_list' %}">
+                    <span class="nav-icon" aria-hidden="true">◫</span><span>Food inventory</span>
+                </a>
                 <a class="nav-item" href="{% url 'dashboard' %}#expiring"><span class="nav-icon" aria-hidden="true">◷</span><span>Expiration tracker</span><span class="nav-soon">PREVIEW</span></a>
                 {% if request.user.role == 'manager' %}
                     <a class="nav-item" href="{% url 'dashboard' %}#members"><span class="nav-icon" aria-hidden="true">♧</span><span>Members</span></a>
