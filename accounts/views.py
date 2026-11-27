@@ -1,6 +1,7 @@
 from django.contrib import messages
 from django.contrib.auth import get_user_model, login
 from django.contrib.auth.decorators import login_required
+from django.db import transaction
 from django.shortcuts import get_object_or_404, redirect, render
 
 from .decorators import role_required
@@ -8,6 +9,14 @@ from .forms import FridgeItemForm, ProfileForm, RegistrationForm
 from .models import FridgeItem
 
 User = get_user_model()
+
+
+def custom_404(request, exception):
+    return render(request, '404.html', status=404)
+
+
+def custom_500(request):
+    return render(request, '500.html', status=500)
 
 
 def _can_manage_all(user):
@@ -131,7 +140,7 @@ def edit_profile(request):
 
 @login_required
 def fridge_item_list(request):
-    items = _scoped_items_queryset(request.user)
+    items = _scoped_items_queryset(request.user).select_related('owner')
     zone_filter = request.GET.get('zone', '').strip()
 
     if zone_filter in dict(FridgeItem.StorageZone.choices):
@@ -152,11 +161,12 @@ def fridge_item_list(request):
 @login_required
 def fridge_item_create(request):
     if request.method == 'POST':
-        form = FridgeItemForm(request.POST)
+        form = FridgeItemForm(request.POST, owner=request.user)
         if form.is_valid():
-            item = form.save(commit=False)
-            item.owner = request.user
-            item.save()
+            with transaction.atomic():
+                item = form.save(commit=False)
+                item.owner = request.user
+                item.save()
             messages.success(request, f'Added "{item.name}" to fridge tracking.')
             return redirect('fridge_item_list')
         messages.error(request, 'Please correct the errors below.')
@@ -179,9 +189,10 @@ def fridge_item_update(request, pk):
     item = get_object_or_404(_scoped_items_queryset(request.user), pk=pk)
 
     if request.method == 'POST':
-        form = FridgeItemForm(request.POST, instance=item)
+        form = FridgeItemForm(request.POST, instance=item, owner=item.owner)
         if form.is_valid():
-            form.save()
+            with transaction.atomic():
+                form.save()
             messages.success(request, f'Updated "{item.name}".')
             return redirect('fridge_item_list')
         messages.error(request, 'Please correct the errors below.')
@@ -205,7 +216,8 @@ def fridge_item_delete(request, pk):
 
     if request.method == 'POST':
         item_name = item.name
-        item.delete()
+        with transaction.atomic():
+            item.delete()
         messages.success(request, f'Removed "{item_name}" from fridge tracking.')
         return redirect('fridge_item_list')
 

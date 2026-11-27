@@ -13,7 +13,7 @@
             <div class="field-wrap">
                 <label for="{{ field.id_for_label }}">{{ field.label }}</label>
                 {{ field }}
-                {% if field.help_text %}<div class="field-help">{{ field.help_text|safe }}</div>{% endif %}
+                {% if field.help_text %}<div class="field-help">{{ field.help_text }}</div>{% endif %}
                 {% if field.errors %}<div class="field-error">{{ field.errors }}</div>{% endif %}
             </div>
         {% endfor %}

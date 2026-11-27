@@ -84,3 +84,28 @@ Make sure the following are installed:
 ```bash
 git clone [https://github.com/danemanueldiaquino/FridgeMate-Diaquino-Dan-G5.git](https://github.com/danemanueldiaquino/FridgeMate-Diaquino-Dan-G5.git)
 cd FridgeMate-Diaquino-Dan-G5
+
+### 2. Configure the Environment
+
+Copy `.env.example` to `.env`, replace all placeholder values, and start PostgreSQL.
+The environment file is excluded from Git.
+
+### 3. Install Dependencies and Initialize the Database
+
+```bash
+python -m venv venv
+venv\Scripts\activate
+pip install -r requirements.txt
+python manage.py migrate
+python manage.py runserver
+```
+
+Open `http://127.0.0.1:8000/`.
+
+### 4. Run Automated Tests
+
+```bash
+python manage.py test
+```
+
+Tests use an isolated SQLite test database; normal application operations use the PostgreSQL database configured by `.env`.
