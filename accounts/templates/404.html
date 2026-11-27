@@ -1,0 +1,10 @@
+{% extends 'accounts/auth_base.html' %}
+{% block title %}Page not found · FridgeMate{% endblock %}
+{% block auth_content %}
+<div class="auth-heading">
+    <span class="auth-eyebrow">404</span>
+    <h2>That page is<br><em>missing.</em></h2>
+    <p>The link may be outdated or the page may not exist.</p>
+</div>
+<a href="{% url 'dashboard' %}" class="primary-button">Return to dashboard</a>
+{% endblock %}

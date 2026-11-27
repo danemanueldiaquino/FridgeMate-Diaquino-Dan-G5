@@ -1,0 +1,10 @@
+{% extends 'accounts/auth_base.html' %}
+{% block title %}Server error · FridgeMate{% endblock %}
+{% block auth_content %}
+<div class="auth-heading">
+    <span class="auth-eyebrow">500</span>
+    <h2>Something went<br><em>wrong.</em></h2>
+    <p>We could not complete the request. Please try again.</p>
+</div>
+<a href="{% url 'dashboard' %}" class="primary-button">Return to dashboard</a>
+{% endblock %}

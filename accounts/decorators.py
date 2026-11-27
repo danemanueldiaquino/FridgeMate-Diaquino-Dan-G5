@@ -9,7 +9,12 @@ def role_required(role):
         @login_required
         def wrapper(request, *args, **kwargs):
 
-            if request.user.role != role:
+            if role == 'manager':
+                allowed = getattr(request.user, 'is_fridge_manager', False)
+            else:
+                allowed = request.user.role == role
+
+            if not allowed:
                 raise PermissionDenied
 
             return view_func(request, *args, **kwargs)

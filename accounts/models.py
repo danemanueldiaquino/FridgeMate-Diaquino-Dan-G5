@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
+from django.core.validators import MinValueValidator
 from django.db import models
 
 
@@ -56,7 +57,10 @@ class FridgeItem(models.Model):
         choices=StorageZone.choices,
         default=StorageZone.FRIDGE,
     )
-    quantity = models.PositiveIntegerField(default=1)
+    quantity = models.PositiveIntegerField(
+        default=1,
+        validators=[MinValueValidator(1)],
+    )
     unit = models.CharField(max_length=30, default='pcs')
     expiry_date = models.DateField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -64,6 +68,16 @@ class FridgeItem(models.Model):
 
     class Meta:
         ordering = ['expiry_date', '-created_at']
+        constraints = [
+            models.CheckConstraint(
+                condition=models.Q(quantity__gte=1),
+                name='fridgeitem_quantity_at_least_one',
+            ),
+            models.UniqueConstraint(
+                fields=['owner', 'name', 'zone', 'unit', 'expiry_date'],
+                name='unique_fridge_item_details_per_owner',
+            ),
+        ]
 
     def __str__(self):
         return f'{self.name} ({self.quantity} {self.unit})'
